@@ -131,18 +131,20 @@ void test_leds(void)
 	LEDS_OFF;
 }
 
+// should be a power of 2
 #define FIXED 64
 
 void wmww_lightshow(void)
 {
     int x = 0;
 	int dx = 0;
-	int ddx = FIXED;
+	int ddx = 1;
 	int cache = -1;
-	int i, j;
+	unsigned int i;
+	unsigned int j;
 	
-	for (i = 0; i < 5500; i++) {
-	    for (j = 0; j < 30; j++) {
+	for (i = 0; i < 10000; i++) {
+	    for (j = 0; j < 8; j++) {
 	        x += dx;
 	        while (x >= NUM_LEDS * FIXED) {
 	            x -= NUM_LEDS * FIXED;
@@ -153,15 +155,16 @@ void wmww_lightshow(void)
 	        int led = x / FIXED;
 	        if (led != cache) {
 	            set_led(led);
+	            cache = led;
 	        }
 	        long_sleep(WDT_ADLY_1_9);
 	    }
 	    dx += ddx;
         if (dx > FIXED) {
-            ddx -= 1;
+            ddx = -1;
         }
         else if (dx < -FIXED) {
-            ddx =+ 1;
+            ddx = 1;
         }
 	}
 }
