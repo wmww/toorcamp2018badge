@@ -131,6 +131,41 @@ void test_leds(void)
 	LEDS_OFF;
 }
 
+#define FIXED 64
+
+void wmww_lightshow(void)
+{
+    int x = 0;
+	int dx = 0;
+	int ddx = FIXED;
+	int cache = -1;
+	int i, j;
+	
+	for (i = 0; i < 5500; i++) {
+	    for (j = 0; j < 30; j++) {
+	        x += dx;
+	        while (x >= NUM_LEDS * FIXED) {
+	            x -= NUM_LEDS * FIXED;
+	        }
+	        while (x < 0) {
+	            x += NUM_LEDS * FIXED;
+	        }
+	        int led = x / FIXED;
+	        if (led != cache) {
+	            set_led(led);
+	        }
+	        long_sleep(WDT_ADLY_1_9);
+	    }
+	    dx += ddx;
+        if (dx > FIXED) {
+            ddx -= 1;
+        }
+        else if (dx < -FIXED) {
+            ddx =+ 1;
+        }
+	}
+}
+
 /*
  * Start capacitive sensing on one of the pins on Port 2.  Call this function
  * to start sensing, then wait for capsense_result to be set, then call
@@ -319,7 +354,7 @@ int main(void)
 		capsense(LOGO);
 		LPM0;
 		if (check_capsense()) {
-			light_show();
+			wmww_lightshow();
 		}
 		long_sleep(WDT_ADLY_16);
 	}
